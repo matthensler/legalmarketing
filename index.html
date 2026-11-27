@@ -286,6 +286,7 @@ em{font-family:var(--font-serif);font-style:italic;font-weight:600;color:var(--g
 .field input{height:44px;padding:0 14px;font:400 16px/1.65 var(--font-body);color:var(--neutral-950);background:#fff;border:1px solid var(--neutral-300);border-radius:4px;outline:none;width:100%;transition:border-color 120ms,box-shadow 120ms}
 .field input:focus{border-color:var(--navy-900);box-shadow:0 0 0 3px rgba(203,151,80,.45)}
 .field input[aria-invalid="true"]{border-color:#A83434}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .form-err{color:#A83434;font-size:14px}
 .form-note{font-size:13px;color:var(--neutral-600)}
 .form-note a{color:var(--navy-700)}
@@ -617,7 +618,8 @@ em{font-family:var(--font-serif);font-style:italic;font-weight:600;color:var(--g
   </div>
   <div class="c-step" data-step="2" hidden>
     <h1 class="h-contact">Where should we <em>send your plan?</em></h1>
-    <form class="card" id="lead-form" novalidate>
+    <form class="card" id="lead-form" data-leads="" novalidate>
+      <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
       <div class="fields">
         <label class="field"><span>Your name</span><input name="name" type="text" placeholder="Jordan Smith" autocomplete="name" required></label>
         <label class="field"><span>Firm name</span><input name="firm" type="text" placeholder="Smith &amp; Partners LLP" autocomplete="organization" required></label>
@@ -626,13 +628,13 @@ em{font-family:var(--font-serif);font-style:italic;font-weight:600;color:var(--g
       </div>
       <p class="form-err" role="alert" hidden>Please add your name, firm, and a valid email.</p>
       <button type="submit" class="btn btn-accent btn-lg btn-full">Let's Build Your Strategy <svg class="ic" width="19" height="19" aria-hidden="true"><use href="#i-arrow-right"/></svg></button>
-      <p class="form-note">Submitting opens an email to <a href="mailto:hello@legalmarketingfirm.net">hello@legalmarketingfirm.net</a> with your answers filled in — just hit send.</p>
+      <p class="form-note">Prefer email? Write us at <a href="mailto:hello@legalmarketingfirm.net">hello@legalmarketingfirm.net</a>.</p>
     </form>
   </div>
   <div class="c-step" data-step="3" hidden>
     <span class="eyebrow">Request received</span>
     <h1 class="h-contact">Thanks. <em>We'll be in touch.</em></h1>
-    <p class="lede" style="max-width:560px">A strategist will email you within one business day to schedule your 30-minute review. If your email app didn't open, write us directly at <a href="mailto:hello@legalmarketingfirm.net">hello@legalmarketingfirm.net</a>.</p>
+    <p class="lede" style="max-width:560px">A strategist will email you within one business day to schedule your 30-minute review.<span class="c-mailnote" hidden> If your email app didn't open, write us directly at <a href="mailto:hello@legalmarketingfirm.net">hello@legalmarketingfirm.net</a>.</span></p>
     <div><a href="#results" data-go="results" class="btn btn-inverse btn-md">See Real Results</a></div>
   </div>
   <a href="#contact" class="c-back" hidden><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-arrow-left"/></svg>Back</a>
@@ -822,15 +824,31 @@ em{font-family:var(--font-serif);font-style:italic;font-weight:600;color:var(--g
     var f=e.target,d={name:f.name.value.trim(),firm:f.firm.value.trim(),email:f.email.value.trim(),phone:f.phone.value.trim()};
     var bad=false;
     [['name',!d.name],['firm',!d.firm],['email',!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)]].forEach(function(x){f[x[0]].setAttribute('aria-invalid',String(x[1]));if(x[1])bad=true;});
-    $('.form-err').hidden=!bad;
+    var er=$('.form-err');er.textContent='Please add your name, firm, and a valid email.';er.hidden=!bad;
     if(bad)return;
+    var url=f.getAttribute('data-leads'),btn=f.querySelector('button[type="submit"]');
+    var lead={form_name:'Strategy request',practice_area:answers.practice,budget:answers.budget};
+    function done(viaMail){
+      if(typeof gtag==='function')gtag('event','generate_lead',lead);
+      $('.c-mailnote').hidden=!viaMail;
+      step=3;renderStep();
+    }
+    if(url){
+      var data=new URLSearchParams({form:'Strategy request',name:d.name,firm:d.firm,email:d.email,phone:d.phone,
+        practice:answers.practice,budget:answers.budget,page:location.pathname+location.hash,website:f.website.value});
+      btn.disabled=true;
+      fetch(url,{method:'POST',mode:'no-cors',body:data})
+        .then(function(){f.reset();done(false);})
+        .catch(function(){var er=$('.form-err');er.innerHTML='Something went wrong. Please email us at <a href="mailto:'+EMAIL+'">'+EMAIL+'</a>.';er.hidden=false;})
+        .then(function(){btn.disabled=false;});
+      return;
+    }
     var subject='Strategy Request — '+d.firm;
     var body=['Hi Legal Marketing Firm,','',"I'd like to build a strategy for my firm.",'',
       'Name: '+d.name,'Firm: '+d.firm,'Email: '+d.email,'Phone: '+(d.phone||'—'),
       'Practice area: '+(answers.practice||'—'),'Monthly marketing budget: '+(answers.budget||'—'),'','Thanks!'].join('\n');
-    if(typeof gtag==='function')gtag('event','generate_lead',{practice_area:answers.practice,budget:answers.budget});
     window.location.href='mailto:'+EMAIL+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
-    step=3;renderStep();
+    done(true);
   });
 
   /* ---------- init ---------- */
