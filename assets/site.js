@@ -1,7 +1,7 @@
 /* Legal Marketing Firm — shared site script. No dependencies. */
 (function () {
   'use strict';
-  var LEADS_URL = 'https://script.google.com/macros/s/AKfycbyDQZsU3oQ1jXhcfPe2zIYthFdLu7Rc5jt8B-SGUJuiQjvgo9ETrxGCBN53RoDr6zs6/exec';
+  var LEADS_URL = 'https://script.google.com/macros/s/AKfycbxIeH_e8a2QopGls5BImXP40cvBwWxYudqxurniejeyus8HAhafUnjbo3FwffopECil/exec';
   var EMAIL = 'hello@legalmarketingfirm.net';
   var GOALS = {
     maintain: { name: 'Maintain Business', pct: 5 },
