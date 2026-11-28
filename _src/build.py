@@ -18,6 +18,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 SITE = 'https://www.legalmarketingfirm.net'
 EMAIL = 'hello@legalmarketingfirm.net'
 GA = 'G-HBNSL2MQQ1'
+GTM = 'GTM-WNSDBWSM'
 TODAY = date.today().isoformat()
 VER = TODAY.replace('-', '')
 ORG_ID = SITE + '/#organization'
@@ -171,6 +172,9 @@ def page(path, title, desc, body, schema=None, crumbs=None, ptype='page', market
 <meta name="theme-color" content="#03182A">
 <link rel="icon" type="image/png" href="/assets/logo-stacked.png">
 {sch_html}
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){{w[l]=w[l]||[];w[l].push({{'gtm.start':new Date().getTime(),event:'gtm.js'}});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);}})(window,document,'script','dataLayer','{GTM}');</script>
+<!-- End Google Tag Manager -->
 <script async src="https://www.googletagmanager.com/gtag/js?id={GA}"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{GA}');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -179,6 +183,7 @@ def page(path, title, desc, body, schema=None, crumbs=None, ptype='page', market
 <link rel="stylesheet" href="/assets/site.css?v={VER}">
 </head>
 <body data-page-type="{ptype}" data-market="{e(market)}" data-practice="{e(practice)}">
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id={GTM}" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 {header(path)}
 <div id="main">
 {body}
